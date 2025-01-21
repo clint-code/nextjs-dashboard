@@ -34,21 +34,31 @@ export async function createInvoice(formData: FormData) {
     const amountInCents = amount * 100;
     const date = new Date().toISOString().split('T')[0];
 
-    console.log("Date:", date);
-
-    await sql`
+    try {
+        await sql`
         INSERT INTO invoices (customer_id, amount, status, date)
         VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
     `;
+
+    } catch (error) {
+        console.error('Database Error:', error);
+        //throw new Error('Failed to create invoice.');
+    }
+
     //to clear the client cache and make a new server request
     revalidatePath('/dashboard/invoices');
 
     //to redirect the user to the invoice's page
-    redirect('/dashboard/invoices');
 
+    /**redirect works by throwing an error, which 
+     * would be caught by the catch block by calling
+     * this after try/catch
+     **/
+    redirect('/dashboard/invoices');
 }
 
 export async function updateInvoice(id: string, formData: FormData) {
+
     const { customerId, amount, status } = UpdateInvoice.parse({
         customerId: formData.get('customerId'),
         amount: formData.get('amount'),
@@ -57,17 +67,23 @@ export async function updateInvoice(id: string, formData: FormData) {
 
     const amountInCents = amount * 100;
 
-    await sql`
-        UPDATE invoices
-        SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
-        WHERE id = ${id}
-    `;
+    try {
+        await sql`
+            UPDATE invoices
+            SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
+            WHERE id = ${id}
+        `;
+
+    } catch (error) {
+        console.error('Database Error:', error);
+    }
 
     revalidatePath('/dashboard/invoices');
     redirect('/dashboard/invoices');
 }
 
 export async function deleteInvoice(id: string) {
+
     await sql`DELETE FROM invoices WHERE id = ${id}`;
     revalidatePath('/dashboard/invoices');
 }
