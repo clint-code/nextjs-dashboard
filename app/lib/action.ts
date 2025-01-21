@@ -21,6 +21,7 @@ const FormSchema = z.object({
 });
 
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
+const UpdateInvoice = FormSchema.omit({ id: true, date: true });
 
 export async function createInvoice(formData: FormData) {
 
@@ -33,18 +34,35 @@ export async function createInvoice(formData: FormData) {
     const amountInCents = amount * 100;
     const date = new Date().toISOString().split('T')[0];
 
+    console.log("Date:", date);
+
     await sql`
         INSERT INTO invoices (customer_id, amount, status, date)
         VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
     `;
+    //to clear the client cache and make a new server request
+    revalidatePath('/dashboard/invoices');
+
+    //to redirect the user to the invoice's page
+    redirect('/dashboard/invoices');
+
+}
+
+export async function updateInvoice(id: string, formData: FormData) {
+    const { customerId, amount, status } = UpdateInvoice.parse({
+        customerId: formData.get('customerId'),
+        amount: formData.get('amount'),
+        status: formData.get('status')
+    });
+
+    const amountInCents = amount * 100;
+
+    await sql`
+        UPDATE invoices
+        SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
+        WHERE id = ${id}
+    `;
 
     revalidatePath('/dashboard/invoices');
     redirect('/dashboard/invoices');
-
-    console.log("Amount in cents:", amountInCents);
-
-    console.log("Date:", date);
-
-    console.log("Data type:", typeof amountInCents);
-
 }
