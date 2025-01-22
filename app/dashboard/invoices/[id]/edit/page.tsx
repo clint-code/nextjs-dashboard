@@ -18,6 +18,11 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     ]);
 
     if(!invoice){
+        /**notFound() allows you to render the not-found file 
+         * within a route segment and inject a 
+         * <meta name="robots" content="noindex" /> tag which means 
+         * that the page shouldn't appear in search engine results
+         * */
         notFound();
     }
 
