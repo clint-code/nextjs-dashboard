@@ -1,4 +1,4 @@
-//error.tsx needs to be a Client Component
+//error.tsx needs to be a Client Component. This is useful for catching uncaught exceptions
 'use client';
 
 import { useEffect } from "react";
@@ -13,6 +13,11 @@ export default function Error({error, reset}: {
     error: Error & { digest? :string };
     reset: () => void;
 }) {
+
+    /**
+     * the [error] dependency array ensures that the useEffect hook runs 
+     * only when the error prop changes
+     */
     useEffect(() => {
         // Optionally log the error to an error reporting service
         console.error("Error:",error);
