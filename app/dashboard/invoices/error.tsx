@@ -4,7 +4,7 @@
 import { useEffect } from "react";
 
 /**
- * the error prop is an instance of JS native Error object that are thrown when runtime errors occur
+ * the error prop is an instance of JS native Error object that is thrown when runtime errors occur
  * the reset prop is a function to re-render the route segment when executed
  * error:Error & { digest? :string } is a type that extends the native Error object with an optional digest property
  * reset: () => void means that reset is a function that takes no arguments and returns void
