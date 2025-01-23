@@ -14,26 +14,71 @@ import { redirect } from 'next/navigation';
 
 const FormSchema = z.object({
     id: z.string(),
-    customerId: z.string(),
-    amount: z.coerce.number(),
-    status: z.enum(['pending', 'paid']),
+    customerId: z.string({
+        invalid_type_error: 'Please select a customer.'
+    }),
+    amount: z.coerce
+        .number()
+        .gt(0, { message: 'Please enter an amount greater than $0.' }),
+    status: z.enum(['pending', 'paid'], {
+        invalid_type_error: 'Please select an invoice status.',
+    }),
     date: z.string()
 });
+
+/**
+ * The State type describes the shape of the object that manages 
+ * the state, in the context of handling form errors and messages.
+ * These arrays are intended to hold the error messages related 
+ * to the form fields. For the message optional property, it can be 
+ * a string or null that can store a general message that's not specific
+ * to any particular form field
+ */
+export type State = {
+    errors?: {
+        customerId?: string[];
+        amount?: string[];
+        status?: string[];
+    };
+    message?: string | null;
+};
 
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 const UpdateInvoice = FormSchema.omit({ id: true, date: true });
 
-export async function createInvoice(formData: FormData) {
+/**
+ * 
+ * prevState - contains the state passsed from the useActionState hook 
+ * 
+ */
 
-    const { customerId, amount, status } = CreateInvoice.parse({
+export async function createInvoice(prevState: State, formData: FormData) {
+    // Validate form fields using Zod
+    /**safeParse() will return an object containing either 
+     * a success or error field helping validation more gracefully 
+     * without having put this logic inside the try/catch block
+    */
+    const validatedFields = CreateInvoice.safeParse({
         customerId: formData.get('customerId'),
         amount: formData.get('amount'),
         status: formData.get('status')
     });
 
+    // If the form validation fails, return the error messages, else continue
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: 'Missing Fields. Failed to Create Invoice.'
+        };
+    }
+
+    // Prepare data for insertion into the database
+    const { customerId, amount, status } = validatedFields.data;
+
     const amountInCents = amount * 100;
     const date = new Date().toISOString().split('T')[0];
 
+    // Insert data into the database
     try {
         await sql`
         INSERT INTO invoices (customer_id, amount, status, date)
@@ -42,19 +87,20 @@ export async function createInvoice(formData: FormData) {
 
     } catch (error) {
         console.error('Database Error:', error);
-        //throw new Error('Failed to create invoice.');
+        // If a database error occurs, return a more specific error.    }
+        return {
+            message: 'Database Error. Failed to Create Invoice.'
+        };
     }
 
-    //to clear the client cache and make a new server request
     revalidatePath('/dashboard/invoices');
 
-    //to redirect the user to the invoice's page
-
     /**redirect works by throwing an error, which 
-     * would be caught by the catch block by calling
-     * this after try/catch
-     **/
+    * would be caught by the catch block by calling
+    * this after try/catch
+    **/
     redirect('/dashboard/invoices');
+
 }
 
 export async function updateInvoice(id: string, formData: FormData) {
