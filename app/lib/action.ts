@@ -48,7 +48,7 @@ const UpdateInvoice = FormSchema.omit({ id: true, date: true });
 
 /**
  * 
- * prevState - contains the state passsed from the useActionState hook 
+ * prevState - contains the state passed from the useActionState hook 
  * 
  */
 
