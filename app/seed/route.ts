@@ -1,7 +1,6 @@
 //app\seed\route.ts
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
-//import bcryptjs from 'bcryptjs';
 import { db } from '@vercel/postgres';
 import { invoices, customers, revenue, users } from '../lib/placeholder-data';
 
