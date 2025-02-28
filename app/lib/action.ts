@@ -6,7 +6,7 @@
  * and Client Components and they can run on the server side.
  */
 'use server';
-
+//Zod is a type validation library 
 import { z } from 'zod';
 import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
@@ -74,7 +74,6 @@ export async function createInvoice(prevState: State, formData: FormData) {
 
     // Prepare data for insertion into the database
     const { customerId, amount, status } = validatedFields.data;
-
     const amountInCents = amount * 100;
     const date = new Date().toISOString().split('T')[0];
 
@@ -92,6 +91,11 @@ export async function createInvoice(prevState: State, formData: FormData) {
             message: 'Database Error. Failed to Create Invoice.'
         };
     }
+
+    /**
+     * Since you're updating the data displayed in the invoices route, 
+     * to clear this cache and trigger a new request to the server
+     */
 
     revalidatePath('/dashboard/invoices');
 

@@ -15,10 +15,14 @@ export default async function Page(props: {
 }) {
     const searchParams = await props.searchParams;
     const query = searchParams?.query || '';
-    const currentPage = Number(searchParams?.page) || 1;
+    
     //fetchInvoicesPages returns the total number of pages based on the search query
-    const totalPages = await fetchInvoicesPages(query);
+    const currentPage = Number(searchParams?.page) || 1;
+    console.log("Current Page: ", currentPage);
+
     //the totalPages prop is then passed to the Pagination component
+    const totalPages = await fetchInvoicesPages(query);
+    console.log("Total Pages: ", totalPages);
 
     return (
         <div className="w-full">
@@ -29,9 +33,11 @@ export default async function Page(props: {
                 <Search placeholder="Search invoices..." />
                 <CreateInvoice />
             </div>
+
             <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
                 <Table query={query} currentPage={currentPage} />
             </Suspense>
+            
             <div className="mt-5 flex w-full justify-center">
                 <Pagination totalPages={totalPages} />
             </div>
