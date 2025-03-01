@@ -1,4 +1,5 @@
-'use client';//this is a client component; you can use event listeners and hooks
+//this is a client component; you can use event listeners and hooks
+'use client';
 
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
@@ -13,35 +14,46 @@ export default function Search({ placeholder }: { placeholder: string }) {
     console.log(`Searching... ${term}`);
 
     const params = new URLSearchParams(searchParams);
+    console.log("URL Search Params: ", params);
+    
+    //when the user types a new search query, reset the page number to 1
     params.set('page', '1');
+
     if(term){
       params.set('query', term);
     } else {
       params.delete('query');
     }
+
     replace(`${pathname}?${params.toString()}`);
+    console.log("URL Search Params: ", params.toString());
+    
     /**
      * ${pathname}: current path, "/dashboard/invoices"
      * params.toString() translates the input into a URL-friendly format
      * replace(${pathname}?${params.toString()}): updates the URL with the user's data
      * e.g. /dashboard/invoices?query=lee if user searches for "Lee"
      */
-  }, 300)
+  }, 350)
 
   return (
     <div className="relative flex flex-1 flex-shrink-0">
+
       <label htmlFor="search" className="sr-only">
         Search
       </label>
+      
+      {/**the defaultValue is to ensure the input field is in sync 
+       * with the URL and will be populated when sharing */}
+
       <input
         className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
         placeholder={placeholder}
-        onChange={(e) => 
-          handleSearch(e.target.value)
-        }
+        onChange={(e) => handleSearch(e.target.value)}
         defaultValue={searchParams.get('query')?.toString()}
       />
       <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+
     </div>
   );
 }
