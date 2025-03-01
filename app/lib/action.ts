@@ -151,6 +151,7 @@ export async function deleteInvoice(id: string) {
     revalidatePath('/dashboard/invoices');
 }
 
+//the auth logic that is used in the login form
 export async function authenticate(
     prevState: string | undefined,
     formData: FormData,

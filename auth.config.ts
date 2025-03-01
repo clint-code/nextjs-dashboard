@@ -13,7 +13,7 @@ export const authConfig = {
     callbacks: {
         /**This callback is used to verify if the request 
          * is authorized to access a page with Next.js Middleware
-         *  and is called before a request is completed, receiving 
+         * and is called before a request is completed, receiving 
          * an object with the following properties:auth and request. 
          * 
          * The auth object contains the user session and the request object 

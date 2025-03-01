@@ -74,7 +74,8 @@ export default function LoginForm() {
           </div>
 
         </div>
-
+        
+        {/* Hidden input to redirect to the callback URL */}
         <input type="hidden" name="redirectTo" value={callbackUrl} />
 
         <Button className="mt-4 w-full" aria-disabled={isPending}>

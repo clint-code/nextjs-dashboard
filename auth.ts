@@ -6,6 +6,7 @@ import type { User } from '@/app/lib/definitions';
 import bcrypt from 'bcrypt';
 import postgres from 'postgres';
 
+//query the user from the db
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 async function getUser(email: string): Promise<User | undefined> {
@@ -21,6 +22,7 @@ async function getUser(email: string): Promise<User | undefined> {
 export const { auth, signIn, signOut } = NextAuth({
     ...authConfig,
     providers: [
+        //sign in functionality
         Credentails({
             async authorize(credentials) {
                 const parsedCredentials = z
